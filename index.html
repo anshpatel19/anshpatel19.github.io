@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Compass App</title>
+	<style>
+		#compass {
+			width: 200px;
+			height: 200px;
+			border-radius: 50%;
+			border: 2px solid black;
+			position: relative;
+			margin: 50px auto;
+			overflow: hidden;
+		}
+
+		#pig {
+			width: 120px;
+			height: 80px;
+			background-image: url('https://cdn-icons-png.flaticon.com/512/25/25435.png');
+			background-size: cover;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform-origin: center center;
+			transform: translate(-50%, -50%) rotate(0deg);
+			transition: transform 0.5s ease-in-out;
+		}
+
+		#countdown {
+			font-size: 30px;
+			text-align: center;
+			margin-top: 50px;
+		}
+	</style>
+</head>
+<body>
+	<div id="compass">
+		<div id="pig"></div>
+	</div>
+
+	<div id="countdown"></div>
+
+	<script>
+		// Target location
+		var targetLat = 43.707120;
+		var targetLng = -72.292974;
+
+		// Target date
+		var targetDate = new Date('May 6, 2023 13:00:00').getTime();
+
+		// Update countdown every second
+		var countdown = setInterval(function() {
+			var now = new Date().getTime();
+			var distance = targetDate - now;
+			var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+			var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+			var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+			var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+			document.getElementById('countdown').innerHTML = 'Countdown: ' + days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's';
+
+			// Calculate angle between current location and target location
+			navigator.geolocation.getCurrentPosition(function(position) {
+				var lat1 = position.coords.latitude;
+				var lng1 = position.coords.longitude;
+				var lat2 = targetLat;
+				var lng2 = targetLng;
+
+				var y = Math.sin(lng2 - lng1) * Math.cos(lat2);
+				var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1);
+				var angle = Math.atan2(y, x) * 180 / Math.PI;
+
+				// Rotate pig to point towards target location
+				document.getElementById('pig').style.transform = 'translate(-50%, -50%) rotate(' + angle + 'deg)';
+			});
+		}, 1000);
+	</script>
+</body>
+</html>
